@@ -292,7 +292,7 @@
       <div class="logo" aria-hidden="true">🚋</div>
       <div>my<span class="luas">LUAS</span></div>
     </div>
-    <div class="stop-title" id="stopTitle">Loading…</div>
+    <div class="stop-title" id="stopTitle">James Anderson</div>
   </header>
 
   <main>
@@ -671,13 +671,9 @@
       save(TO_KEY, currentTo);
     }
 
+    // The header heading is fixed; the chosen stops show in the From/To boxes and journey card
     function updateTitle() {
-      els.title.innerHTML = "";
-      els.title.append(stopName(currentFrom));
-      if (currentTo) {
-        els.title.append(" ");
-        els.title.appendChild(el("span", "to", "→ " + stopName(currentTo)));
-      }
+      els.title.textContent = "James Anderson";
     }
 
     /* ---------- rendering ---------- */
