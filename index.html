@@ -15,7 +15,7 @@
       --white: #FFFFFF;
       --ink: #12261A;
       --muted: #5B6B60;
-      --red-line: #E4002B;
+      --line: #E3EDE6;
       --error: #B3261E;
       --error-soft: #FDECEA;
       --radius: 18px;
@@ -49,8 +49,9 @@
     }
     .brand span.luas { color: var(--yellow); }
     .stop-title {
-      margin-top: 14px; font-size: 1.35rem; font-weight: 700; line-height: 1.2;
+      margin-top: 14px; font-size: 1.35rem; font-weight: 700; line-height: 1.25;
     }
+    .stop-title .to { color: var(--yellow); }
 
     main {
       flex: 1;
@@ -61,29 +62,89 @@
       display: flex; flex-direction: column; gap: 14px;
     }
 
-    /* Stop picker */
-    .picker label {
-      display: block; font-weight: 700; font-size: 0.9rem;
-      color: var(--green-dark); margin-bottom: 6px;
-      text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .select-wrap { position: relative; }
-    select {
-      width: 100%;
-      appearance: none; -webkit-appearance: none;
-      font: inherit; font-size: 1.15rem; font-weight: 600;
-      padding: 14px 48px 14px 16px;
-      border: 3px solid var(--green);
+    /* Trip picker: From / swap / To */
+    .trip {
+      display: flex; flex-direction: column; gap: 8px;
+      background: var(--white);
       border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: 0 2px 10px rgba(0, 80, 30, 0.08);
+    }
+    .field { min-width: 0; flex: 1; }
+    .field label {
+      display: block; font-weight: 700; font-size: 0.85rem;
+      color: var(--green-dark); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    /* Searchable stop picker: type to filter, or tap ▾ to see the whole list */
+    .combo { position: relative; }
+    .combo input {
+      width: 100%;
+      font: inherit; font-size: 1.1rem; font-weight: 600;
+      padding: 13px 48px 13px 42px;
+      border: 3px solid var(--green);
+      border-radius: 14px;
       background: var(--white); color: var(--ink);
+    }
+    .combo input::placeholder { color: var(--muted); font-weight: 500; }
+    .combo.to input { border-color: var(--yellow); }
+    .combo input:disabled { opacity: 0.6; cursor: not-allowed; }
+    .combo input:focus { outline: 4px solid var(--yellow); outline-offset: 2px; }
+    .combo.to input:focus { outline-color: var(--green); }
+    .combo .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 1.05rem; color: var(--muted); pointer-events: none;
+    }
+    .combo-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; border: none; border-radius: 10px;
+      background: transparent; color: var(--green);
+      font-size: 1.3rem; cursor: pointer;
+    }
+    .combo-toggle:hover { background: var(--green-soft); }
+    .combo-list {
+      position: absolute; left: 0; right: 0; top: calc(100% + 6px);
+      z-index: 20;
+      list-style: none;
+      max-height: min(55vh, 360px); overflow-y: auto;
+      background: var(--white);
+      border: 3px solid var(--green);
+      border-radius: 14px;
+      box-shadow: 0 10px 28px rgba(0, 60, 25, 0.22);
+      padding: 6px 0;
+    }
+    .combo-list .group {
+      padding: 8px 14px 4px;
+      font-size: 0.78rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .combo-list .option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      font-size: 1.05rem; font-weight: 600;
       cursor: pointer;
     }
-    select:focus { outline: 4px solid var(--yellow); outline-offset: 2px; }
-    .select-wrap::after {
-      content: "▾"; position: absolute; right: 18px; top: 50%;
-      transform: translateY(-50%); font-size: 1.3rem; color: var(--green);
-      pointer-events: none;
+    .combo-list .option .dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+      background: var(--green);
     }
+    .combo-list .option .dot.red { background: #E4002B; }
+    .combo-list .option .dot.none { background: var(--yellow); }
+    .combo-list .option.active { background: var(--yellow-soft); }
+    .combo-list .option.selected { color: var(--green-dark); }
+    .combo-list .option.selected::after { content: "✓"; margin-left: auto; color: var(--green); font-weight: 900; }
+    .combo-list mark { background: var(--yellow); color: var(--ink); border-radius: 3px; padding: 0 1px; }
+    .combo-list .no-match { padding: 12px 14px; color: var(--muted); }
+    .swap-row { display: flex; justify-content: center; }
+    .swap {
+      width: 46px; height: 46px; border-radius: 50%;
+      border: none; cursor: pointer;
+      background: var(--yellow); color: var(--green-dark);
+      font-size: 1.4rem; font-weight: 900; line-height: 1;
+      box-shadow: 0 2px 6px rgba(0, 80, 30, 0.2);
+    }
+    .swap:disabled { opacity: 0.4; cursor: not-allowed; }
+    .swap:focus-visible { outline: 4px solid var(--green); outline-offset: 2px; }
 
     /* Service message */
     .message {
@@ -108,30 +169,49 @@
     }
     .error.show { display: block; }
 
-    /* Direction cards */
+    /* Cards */
     .directions { display: flex; flex-direction: column; gap: 14px; }
     .card {
       background: var(--white);
       border-radius: var(--radius);
       box-shadow: 0 2px 10px rgba(0, 80, 30, 0.08);
       overflow: hidden;
+      min-width: 0;
     }
     .card h2 {
       background: var(--green);
       color: var(--white);
       font-size: 1.1rem; font-weight: 800;
       padding: 12px 16px;
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
       text-transform: uppercase; letter-spacing: 0.8px;
     }
     .card h2 .arrow { color: var(--yellow); }
+
+    /* Journey card (From → To) */
+    .journey { border: 3px solid var(--yellow); }
+    .journey h2 {
+      background: var(--yellow); color: var(--green-dark);
+      text-transform: none; letter-spacing: 0; font-size: 1.15rem;
+    }
+    .journey h2 .arrow { color: var(--green); }
+    .journey-meta {
+      background: var(--yellow-soft);
+      padding: 8px 16px;
+      font-size: 0.95rem; font-weight: 600; color: var(--green-dark);
+    }
+    .section-label {
+      font-size: 0.85rem; font-weight: 800; color: var(--green-dark);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-top: 4px;
+    }
+
     .tram {
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px;
       padding: 14px 16px;
-      border-top: 1px solid #E3EDE6;
+      border-top: 1px solid var(--line);
     }
-    .tram:first-of-type { border-top: none; }
     .dest { font-size: 1.15rem; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
     .due {
       flex-shrink: 0;
@@ -139,8 +219,20 @@
       font-variant-numeric: tabular-nums;
       line-height: 1;
     }
-    .due .num { font-size: 2.6rem; font-weight: 800; color: var(--green-dark); }
+    .due .num { font-size: 2.4rem; font-weight: 800; color: var(--green-dark); }
     .due .unit { font-size: 0.95rem; font-weight: 700; color: var(--muted); margin-left: 4px; }
+    .arrive {
+      display: block; margin-top: 4px;
+      font-size: 0.9rem; font-weight: 600; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .arrive b { color: var(--green-dark); }
+    .due.soon {
+      background: var(--yellow-soft);
+      border: 3px solid var(--yellow);
+      border-radius: 14px;
+      padding: 6px 10px;
+    }
     .due.now {
       background: var(--yellow); color: var(--ink);
       font-size: 1.5rem; font-weight: 900;
@@ -153,7 +245,7 @@
       50% { transform: scale(1.06); }
     }
     @media (prefers-reduced-motion: reduce) { .due.now { animation: none; } }
-    .empty { padding: 16px; color: var(--muted); font-size: 1rem; }
+    .empty { padding: 16px; color: var(--muted); font-size: 1rem; line-height: 1.4; border-top: 1px solid var(--line); }
 
     /* Status bar */
     .status {
@@ -184,9 +276,13 @@
     }
 
     @media (min-width: 640px) {
-      .directions { flex-direction: row; }
-      .directions .card { flex: 1; }
       main { max-width: 820px; }
+      .trip { flex-direction: row; align-items: flex-end; }
+      .swap-row { padding-bottom: 4px; }
+      .swap { transform: rotate(90deg); }
+      .directions { flex-direction: row; flex-wrap: wrap; }
+      .directions .card { flex: 1 1 300px; }
+      .directions .journey, .directions .section-label { flex-basis: 100%; }
     }
   </style>
 </head>
@@ -200,12 +296,31 @@
   </header>
 
   <main>
-    <div class="picker">
-      <label for="stopSelect">Your stop</label>
-      <div class="select-wrap">
-        <select id="stopSelect" aria-label="Choose your Luas stop">
-          <option>Loading stops…</option>
-        </select>
+    <div class="trip">
+      <div class="field">
+        <label for="fromInput">From</label>
+        <div class="combo from">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input id="fromInput" type="text" role="combobox" aria-expanded="false"
+                 aria-controls="fromList" aria-autocomplete="list" autocomplete="off"
+                 spellcheck="false" placeholder="Loading stops…">
+          <button class="combo-toggle" type="button" tabindex="-1" aria-label="Show all stops">▾</button>
+          <ul class="combo-list" id="fromList" role="listbox" hidden></ul>
+        </div>
+      </div>
+      <div class="swap-row">
+        <button class="swap" id="swapBtn" type="button" aria-label="Swap From and To" title="Swap From and To">⇅</button>
+      </div>
+      <div class="field">
+        <label for="toInput">To</label>
+        <div class="combo to">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input id="toInput" type="text" role="combobox" aria-expanded="false"
+                 aria-controls="toList" aria-autocomplete="list" autocomplete="off"
+                 spellcheck="false" placeholder="Any destination">
+          <button class="combo-toggle" type="button" tabindex="-1" aria-label="Show all destinations">▾</button>
+          <ul class="combo-list" id="toList" role="listbox" hidden></ul>
+        </div>
       </div>
     </div>
 
@@ -232,12 +347,13 @@
 
   <script>
     const API = "https://luas-class.kluxy.app";
-    const STORAGE_KEY = "myluas.stop";
+    const FROM_KEY = "myluas.stop";
+    const TO_KEY = "myluas.to";
     const DEFAULT_STOP = "MYS";
     const REFRESH_MS = 20000;
 
     const els = {
-      select: document.getElementById("stopSelect"),
+      swap: document.getElementById("swapBtn"),
       title: document.getElementById("stopTitle"),
       error: document.getElementById("error"),
       message: document.getElementById("message"),
@@ -247,18 +363,24 @@
       refreshBtn: document.getElementById("refreshBtn"),
     };
 
-    let currentStop = loadStop();
+    let currentFrom = load(FROM_KEY) || DEFAULT_STOP;
+    let currentTo = load(TO_KEY) || "";
+    let stops = [];
+    const stopById = new Map();
+    const graph = new Map();   // stop id -> Set of neighbouring stop ids
+    let lastForecast = null;   // { stop, data, fetchedAt }
     let timer = null;
     let requestId = 0;
 
-    function loadStop() {
-      try { return localStorage.getItem(STORAGE_KEY) || DEFAULT_STOP; }
-      catch (e) { return DEFAULT_STOP; }
+    /* ---------- storage ---------- */
+    function load(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
     }
-    function saveStop(id) {
-      try { localStorage.setItem(STORAGE_KEY, id); } catch (e) { /* storage blocked: ignore */ }
+    function save(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) { /* storage blocked: ignore */ }
     }
 
+    /* ---------- helpers ---------- */
     function showError(msg) {
       els.error.textContent = "⚠️ " + msg;
       els.error.classList.add("show");
@@ -266,6 +388,18 @@
     function clearError() {
       els.error.textContent = "";
       els.error.classList.remove("show");
+    }
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+    function pad(n) { return String(n).padStart(2, "0"); }
+    function stopName(id) { return stopById.get(id)?.name || id; }
+    function norm(s) {
+      return String(s || "").toLowerCase().normalize("NFD")
+        .replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
     }
 
     async function getJSON(url) {
@@ -285,41 +419,316 @@
       return data;
     }
 
-    function el(tag, className, text) {
-      const node = document.createElement(tag);
-      if (className) node.className = className;
-      if (text != null) node.textContent = text;
-      return node;
+    /* ---------- route map ----------
+       The stop list comes in track order for each line. Most stops simply
+       link to the next one, with three fixes for the Red Line's branches:
+       Connolly is a spur off Busáras, and Saggart's branch leaves at Belgard. */
+    function buildGraph() {
+      graph.clear();
+      const link = (a, b) => {
+        if (!stopById.has(a) || !stopById.has(b)) return;
+        if (!graph.has(a)) graph.set(a, new Set());
+        if (!graph.has(b)) graph.set(b, new Set());
+        graph.get(a).add(b);
+        graph.get(b).add(a);
+      };
+      const skip = new Set(["GDK|CON", "CON|BUS", "TAL|FET"]);
+      for (const line of ["red", "green"]) {
+        const ids = stops.filter(s => s.line === line).map(s => s.id);
+        for (let i = 0; i < ids.length - 1; i++) {
+          if (!skip.has(ids[i] + "|" + ids[i + 1])) link(ids[i], ids[i + 1]);
+        }
+      }
+      link("GDK", "BUS");
+      link("CON", "BUS");
+      link("BEL", "FET");
     }
+
+    // Shortest list of stops from a to b (the network is a tree, so it is the only route)
+    function route(a, b) {
+      if (!graph.has(a) || !graph.has(b)) return null;
+      const prev = new Map([[a, null]]);
+      const queue = [a];
+      while (queue.length) {
+        const cur = queue.shift();
+        if (cur === b) break;
+        for (const next of graph.get(cur)) {
+          if (!prev.has(next)) { prev.set(next, cur); queue.push(next); }
+        }
+      }
+      if (!prev.has(b)) return null;
+      const path = [];
+      for (let s = b; s != null; s = prev.get(s)) path.unshift(s);
+      return path;
+    }
+
+    function stopIdFromName(name) {
+      const n = norm(name);
+      if (!n) return null;
+      for (const s of stops) if (norm(s.name) === n) return s.id;
+      for (const s of stops) {
+        const m = norm(s.name);
+        if (m.startsWith(n) || n.startsWith(m)) return s.id;
+      }
+      return null;
+    }
+
+    // Does a tram leaving `fromId` for `destination` stop at `toId` on the way?
+    function tramServes(fromId, destination, toId) {
+      const destId = stopIdFromName(destination);
+      if (!destId) return false;
+      if (destId === toId) return true;
+      const path = route(fromId, destId);
+      return !!path && path.includes(toId);
+    }
+
+    /* ---------- searchable stop picker ----------
+       Type part of a name (or a stop code like "MYS") to filter, or tap ▾
+       to browse the full list. Arrow keys + Enter work too. */
+    const LINE_LABEL = { red: "Red Line", green: "Green Line" };
+
+    function makeCombo(root, { emptyLabel = null, onSelect }) {
+      const input = root.querySelector("input");
+      const toggle = root.querySelector(".combo-toggle");
+      const list = root.querySelector(".combo-list");
+      let items = [];      // [{ id, name, line }]
+      let value = emptyLabel != null ? "" : null;
+      let shown = [];      // items currently listed, in display order
+      let active = -1;
+
+      const nameOf = id => (id ? (items.find(i => i.id === id)?.name ?? id) : "");
+      const restoreText = () => { input.value = nameOf(value); };
+
+      function matches(query) {
+        const q = norm(query);
+        let out = items;
+        if (q) {
+          out = items.filter(i => norm(i.name).includes(q) || norm(i.id) === q);
+          // Names that start with what you typed come first
+          out = [...out.filter(i => norm(i.name).startsWith(q)), ...out.filter(i => !norm(i.name).startsWith(q))];
+        }
+        if (emptyLabel != null && !q) out = [{ id: "", name: emptyLabel, line: "" }, ...out];
+        return out;
+      }
+
+      function highlight(name, query) {
+        const frag = document.createDocumentFragment();
+        const q = query.trim().toLowerCase();
+        const at = q ? name.toLowerCase().indexOf(q) : -1;
+        if (at < 0) { frag.append(name); return frag; }
+        frag.append(name.slice(0, at), el("mark", null, name.slice(at, at + q.length)), name.slice(at + q.length));
+        return frag;
+      }
+
+      function render(query) {
+        shown = matches(query);
+        list.innerHTML = "";
+        if (!shown.length) {
+          list.appendChild(el("li", "no-match", "No stops match “" + query.trim() + "”"));
+          active = -1;
+          return;
+        }
+        let lastLine = null;
+        shown.forEach((item, i) => {
+          if (item.line && item.line !== lastLine && !norm(query)) {
+            const g = el("li", "group", LINE_LABEL[item.line] || item.line);
+            g.setAttribute("role", "presentation");
+            list.appendChild(g);
+          }
+          lastLine = item.line;
+          const li = el("li", "option");
+          li.id = list.id + "-" + i;
+          li.setAttribute("role", "option");
+          li.dataset.index = i;
+          li.appendChild(el("span", "dot " + (item.line || "none")));
+          const label = el("span");
+          label.appendChild(highlight(item.name, query));
+          li.appendChild(label);
+          if (item.id === value) { li.classList.add("selected"); li.setAttribute("aria-selected", "true"); }
+          list.appendChild(li);
+        });
+        setActive(query ? 0 : Math.max(0, shown.findIndex(i => i.id === value)));
+      }
+
+      function setActive(i) {
+        active = i;
+        list.querySelectorAll(".option").forEach(li => li.classList.toggle("active", Number(li.dataset.index) === i));
+        const li = list.querySelector('.option[data-index="' + i + '"]');
+        if (li) { li.scrollIntoView({ block: "nearest" }); input.setAttribute("aria-activedescendant", li.id); }
+      }
+
+      function open(query = "") {
+        if (input.disabled) return;
+        render(query);
+        list.hidden = false;
+        input.setAttribute("aria-expanded", "true");
+      }
+      function close() {
+        list.hidden = true;
+        input.setAttribute("aria-expanded", "false");
+        input.removeAttribute("aria-activedescendant");
+        restoreText();
+      }
+      function choose(i) {
+        const item = shown[i];
+        if (!item) return;
+        const changed = item.id !== value;
+        value = item.id;
+        close();
+        input.blur();
+        if (changed) onSelect(value);
+      }
+
+      input.addEventListener("focus", () => { input.select(); open(""); });
+      input.addEventListener("input", () => open(input.value));
+      input.addEventListener("keydown", e => {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (list.hidden) open(""); else setActive(Math.min(shown.length - 1, active + 1));
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setActive(Math.max(0, active - 1));
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          if (!list.hidden && active >= 0) choose(active);
+        } else if (e.key === "Escape") {
+          close();
+          input.blur();
+        }
+      });
+      input.addEventListener("blur", () => setTimeout(() => {
+        if (document.activeElement !== input) close();
+      }, 120));
+      // mousedown (not click) so the input doesn't lose focus first
+      list.addEventListener("mousedown", e => {
+        e.preventDefault();
+        const li = e.target.closest(".option");
+        if (li) choose(Number(li.dataset.index));
+      });
+      toggle.addEventListener("mousedown", e => e.preventDefault());
+      toggle.addEventListener("click", () => {
+        if (!list.hidden) { close(); input.blur(); return; }
+        input.focus();
+      });
+
+      return {
+        setItems(newItems) { items = newItems; restoreText(); },
+        setValue(id) { value = id; restoreText(); },
+        setDisabled(b) { input.disabled = b; toggle.disabled = b; },
+        setPlaceholder(t) { input.placeholder = t; },
+      };
+    }
+
+    const fromCombo = makeCombo(document.querySelector(".combo.from"), {
+      onSelect(id) {
+        currentFrom = id;
+        save(FROM_KEY, currentFrom);
+        fillToOptions();
+        reloadForFrom();
+      },
+    });
+
+    const toCombo = makeCombo(document.querySelector(".combo.to"), {
+      emptyLabel: "Any destination",
+      onSelect(id) {
+        currentTo = id;
+        save(TO_KEY, currentTo);
+        els.swap.disabled = !currentTo;
+        // Same "From" stop: redraw from the data we already have
+        if (lastForecast && lastForecast.stop === currentFrom) {
+          renderForecast(lastForecast.data, lastForecast.fetchedAt);
+        } else {
+          reloadForFrom();
+        }
+      },
+    });
 
     async function loadStops() {
       const data = await getJSON(API + "/stops");
-      const stops = Array.isArray(data.stops) ? data.stops : [];
+      stops = Array.isArray(data.stops) ? data.stops : [];
       if (!stops.length) throw new Error("No stops were returned.");
+      stops.forEach(s => stopById.set(s.id, s));
+      buildGraph();
 
-      const groups = [
-        { line: "red", label: "🔴 Red Line" },
-        { line: "green", label: "🟢 Green Line" },
-      ];
-      els.select.innerHTML = "";
-      for (const g of groups) {
-        const og = document.createElement("optgroup");
-        og.label = g.label;
-        for (const s of stops.filter(s => s.line === g.line)) {
-          const opt = el("option", null, s.name);
-          opt.value = s.id;
-          og.appendChild(opt);
-        }
-        if (og.children.length) els.select.appendChild(og);
-      }
-
-      // Fall back to default if the saved stop no longer exists
-      if (!stops.some(s => s.id === currentStop)) currentStop = DEFAULT_STOP;
-      els.select.value = currentStop;
+      if (!stopById.has(currentFrom)) currentFrom = DEFAULT_STOP;
+      fromCombo.setItems(stops);
+      fromCombo.setValue(currentFrom);
+      fromCombo.setPlaceholder("Type a stop name…");
+      fillToOptions();
     }
 
-    function renderForecast(data) {
-      els.title.textContent = data.stopName || currentStop;
+    // "To" only lists stops on the same line as "From"
+    function fillToOptions() {
+      const from = stopById.get(currentFrom);
+      toCombo.setItems(from ? stops.filter(s => s.line === from.line && s.id !== from.id) : []);
+
+      const valid = from && stopById.get(currentTo)?.line === from.line && currentTo !== currentFrom;
+      if (!valid) currentTo = "";
+      toCombo.setValue(currentTo);
+      toCombo.setDisabled(!from);
+      toCombo.setPlaceholder(from ? "Any destination – type to search" : "Any destination");
+      els.swap.disabled = !currentTo;
+      save(TO_KEY, currentTo);
+    }
+
+    function updateTitle() {
+      els.title.innerHTML = "";
+      els.title.append(stopName(currentFrom));
+      if (currentTo) {
+        els.title.append(" ");
+        els.title.appendChild(el("span", "to", "→ " + stopName(currentTo)));
+      }
+    }
+
+    /* ---------- rendering ---------- */
+    function tramRow(t, fetchedAt) {
+      const row = el("div", "tram");
+      const mins = Number(t.due);
+      const destCell = el("div", "dest", t.destination || "—");
+      const due = el("div", "due");
+      if (!isNaN(mins)) {
+        // Minutes become an arrival timestamp; tick() counts it down every second
+        row.dataset.arrive = String(fetchedAt + mins * 60 * 1000);
+        destCell.appendChild(el("span", "arrive"));
+      } else {
+        due.append(el("span", "num", String(t.due)));
+      }
+      row.append(destCell, due);
+      return row;
+    }
+
+    function journeyCard(dirs, fetchedAt) {
+      const card = el("section", "card journey");
+      const h2 = el("h2");
+      h2.append(stopName(currentFrom), " ", el("span", "arrow", "→"), " ", stopName(currentTo));
+      card.appendChild(h2);
+
+      const matches = [];
+      for (const dir of dirs) {
+        for (const t of (Array.isArray(dir.trams) ? dir.trams : [])) {
+          if (tramServes(currentFrom, t.destination, currentTo)) matches.push({ ...t, dirName: dir.name });
+        }
+      }
+      matches.sort((a, b) => Number(a.due) - Number(b.due));
+
+      const path = route(currentFrom, currentTo);
+      const line = stopById.get(currentFrom)?.line === "red" ? "Red Line" : "Green Line";
+      const parts = [line];
+      if (path) parts.push((path.length - 1) + (path.length === 2 ? " stop" : " stops"));
+      if (matches.length && matches[0].dirName) parts.push(matches[0].dirName);
+      card.appendChild(el("div", "journey-meta", parts.join(" · ")));
+
+      if (!matches.length) {
+        card.appendChild(el("div", "empty",
+          "No direct trams to " + stopName(currentTo) + " in the current forecast. " +
+          "You may need to change trams on the way."));
+      }
+      for (const t of matches.slice(0, 3)) card.appendChild(tramRow(t, fetchedAt));
+      return card;
+    }
+
+    function renderForecast(data, fetchedAt) {
+      updateTitle();
 
       if (data.message) {
         els.messageText.textContent = data.message;
@@ -330,53 +739,88 @@
 
       els.directions.innerHTML = "";
       const dirs = Array.isArray(data.directions) ? data.directions : [];
+
+      if (currentTo) {
+        els.directions.appendChild(journeyCard(dirs, fetchedAt));
+        if (dirs.length) {
+          els.directions.appendChild(el("div", "section-label", "All trams from " + (data.stopName || stopName(currentFrom))));
+        }
+      }
+
       if (!dirs.length) {
-        els.directions.appendChild(el("div", "card")).appendChild(
-          el("div", "empty", "No tram information for this stop right now.")
-        );
-        return;
+        const card = el("div", "card");
+        card.appendChild(el("div", "empty", "No tram information for this stop right now."));
+        els.directions.appendChild(card);
       }
 
       for (const dir of dirs) {
         const card = el("section", "card");
         const h2 = el("h2");
-        const arrow = /out/i.test(dir.name) ? "→" : "←";
-        h2.append(el("span", "arrow", arrow), document.createTextNode(dir.name || "Direction"));
+        h2.append(el("span", "arrow", /out/i.test(dir.name) ? "→" : "←"), document.createTextNode(dir.name || "Direction"));
         card.appendChild(h2);
 
         const trams = (Array.isArray(dir.trams) ? dir.trams : []).slice(0, 3);
-        if (!trams.length) {
-          card.appendChild(el("div", "empty", "No trams forecast."));
-        }
-        for (const t of trams) {
-          const row = el("div", "tram");
-          row.appendChild(el("div", "dest", t.destination || "—"));
-          const mins = Number(t.due);
-          let due;
-          if (mins === 0) {
-            due = el("div", "due now", "Due");
-          } else {
-            due = el("div", "due");
-            due.append(el("span", "num", isNaN(mins) ? String(t.due) : String(mins)),
-                       el("span", "unit", mins === 1 ? "min" : "mins"));
-          }
-          row.appendChild(due);
-          card.appendChild(row);
-        }
+        if (!trams.length) card.appendChild(el("div", "empty", "No trams forecast."));
+        for (const t of trams) card.appendChild(tramRow(t, fetchedAt));
         els.directions.appendChild(card);
+      }
+      tick();
+    }
+
+    // Runs every second: whole minutes until the last minute, then a m:ss countdown
+    function tick() {
+      const now = Date.now();
+      for (const row of els.directions.querySelectorAll(".tram[data-arrive]")) {
+        const arriveAt = Number(row.dataset.arrive);
+        const secs = Math.max(0, Math.round((arriveAt - now) / 1000));
+        const due = row.querySelector(".due");
+        const arrive = row.querySelector(".arrive");
+        const clock = new Date(arriveAt).toLocaleTimeString("en-IE", {
+          hour: "2-digit", minute: "2-digit", second: "2-digit",
+        });
+
+        if (secs === 0) {
+          if (!due.classList.contains("now")) {
+            due.className = "due now";
+            due.textContent = "Due";
+          }
+          arrive.textContent = "Arriving now";
+        } else if (secs <= 60) {
+          due.className = "due soon";
+          due.innerHTML = "";
+          due.append(
+            el("span", "num", Math.floor(secs / 60) + ":" + pad(secs % 60)),
+            el("span", "unit", "left")
+          );
+          arrive.innerHTML = "";
+          arrive.append("Arrives ", el("b", null, clock));
+        } else {
+          const mins = Math.ceil(secs / 60);
+          due.className = "due";
+          due.innerHTML = "";
+          due.append(
+            el("span", "num", String(mins)),
+            el("span", "unit", mins === 1 ? "min" : "mins")
+          );
+          arrive.innerHTML = "";
+          arrive.append("Arrives ", el("b", null, clock));
+        }
       }
     }
 
+    /* ---------- data loading ---------- */
     async function refresh() {
       const myId = ++requestId;
-      const stop = currentStop;
+      const stop = currentFrom;
       els.refreshBtn.disabled = true;
       try {
         const data = await getJSON(API + "/forecast?stop=" + encodeURIComponent(stop));
         if (myId !== requestId) return; // a newer request replaced this one
         clearError();
-        renderForecast(data);
-        els.updated.textContent = new Date().toLocaleTimeString("en-IE", {
+        const fetchedAt = Date.now();
+        lastForecast = { stop, data, fetchedAt };
+        renderForecast(data, fetchedAt);
+        els.updated.textContent = new Date(fetchedAt).toLocaleTimeString("en-IE", {
           hour: "2-digit", minute: "2-digit", second: "2-digit",
         });
       } catch (e) {
@@ -393,14 +837,22 @@
       timer = setInterval(refresh, REFRESH_MS);
     }
 
-    els.select.addEventListener("change", () => {
-      currentStop = els.select.value;
-      saveStop(currentStop);
-      els.title.textContent = els.select.options[els.select.selectedIndex].text;
+    function reloadForFrom() {
+      updateTitle();
       els.directions.innerHTML = '<div class="loading">Fetching live trams…</div>';
       els.message.hidden = true;
       refresh();
       startTimer();
+    }
+
+    /* ---------- events ---------- */
+    els.swap.addEventListener("click", () => {
+      if (!currentTo) return;
+      [currentFrom, currentTo] = [currentTo, currentFrom];
+      fromCombo.setValue(currentFrom);
+      save(FROM_KEY, currentFrom);
+      fillToOptions();
+      reloadForFrom();
     });
 
     els.refreshBtn.addEventListener("click", () => { refresh(); startTimer(); });
@@ -415,13 +867,16 @@
         await loadStops();
       } catch (e) {
         showError("Couldn't load the stop list: " + e.message);
-        els.select.innerHTML = "";
-        const opt = el("option", null, currentStop);
-        opt.value = currentStop;
-        els.select.appendChild(opt);
+        fromCombo.setItems([{ id: currentFrom, name: currentFrom, line: "" }]);
+        fromCombo.setValue(currentFrom);
+        currentTo = "";
+        toCombo.setValue("");
+        toCombo.setDisabled(true);
+        els.swap.disabled = true;
       }
       await refresh();
       startTimer();
+      setInterval(tick, 1000);
     })();
   </script>
 </body>
